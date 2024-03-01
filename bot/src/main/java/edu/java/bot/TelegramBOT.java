@@ -60,7 +60,7 @@ public class TelegramBOT implements Bot {
     }
 
     private void setMenuButtonCommands() {
-        BotCommand[] commands = messageProcessor.commands().stream().map(Command::toApiCommand)
+        BotCommand[] commands = messageProcessor.getCommands().stream().map(Command::toApiCommand)
             .toArray(BotCommand[]::new);
 
         SetMyCommands setMyCommands = new SetMyCommands(commands);
