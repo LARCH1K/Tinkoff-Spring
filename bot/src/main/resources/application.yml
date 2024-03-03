@@ -1,6 +1,7 @@
 app:
   telegram-token: ${TELEGRAM_TOKEN}
-
+  client:
+    scrapper: ${SCRAPPER_BASE_URL:http://localhost:8080}
 spring:
   application:
     name: bot
@@ -9,6 +10,6 @@ spring:
 
 server:
   port: 8090
-
+# http://localhost:8090/swagger-ui/index.html
 logging:
   config: classpath:log4j2-plain.xml
