@@ -28,4 +28,3 @@ public class GitHubController {
         return gitHubIssueClient.getIssue(owner, repo, issueNumber);
     }
 }
-
