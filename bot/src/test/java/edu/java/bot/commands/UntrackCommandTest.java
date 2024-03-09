@@ -1,59 +1,61 @@
 package edu.java.bot.commands;
 
-import com.pengrad.telegrambot.model.Chat;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.models.LinkTracker;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
+import edu.java.bot.entity.UserChat;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UntrackCommandTest {
-
-    // Class to be tested
+@MockitoSettings(strictness = Strictness.LENIENT)
+public class UntrackCommandTest extends CommandTest {
     @InjectMocks
-    private UntrackCommand untrackCommand;
+    private UntrackCommand unTrackCommand;
 
-    @InjectMocks
-    private LinkTracker linkTracker;
-
-    // Dependencies (will be mocked)
-
-    @Mock
-    private Update update;
-    @Mock
-    private Message message;
-    @Mock
-    private Chat chat;
-
-    final long chatId = 123L;
-
-    @BeforeEach
-    void init() {
-        when(update.message()).thenReturn(message);
-        when(message.chat()).thenReturn(chat);
-        when(chat.id()).thenReturn(chatId);
+    @Test
+    public void assertThatCommandReturnedRightString() {
+        assertEquals("/untrack", unTrackCommand.command());
     }
 
     @Test
-    @DisplayName("Check /untrack command")
-    void untrackCommandTest() {
-        when(message.text()).thenReturn("/untrack https://example.com");
-        LinkTracker.trackLink(chatId, "https://example.com");
+    public void assertThatDescriptionReturnedRightString() {
+        assertEquals("Stop tracking a link", unTrackCommand.description());
+    }
 
-        SendMessage actualResult = untrackCommand.handle(update);
-        String expectedString = "Tracking stopped for the link: https://example.com";
+    @Test
+    public void assertThatWrongSyntaxReturnedRightResponse() {
+        when(message.text()).thenReturn("/untrack");
+        assertEquals("Please provide a link to track.", unTrackCommand.handle(update).getParameters().get("text"));
+    }
 
-        Assertions.assertEquals(expectedString, actualResult.getParameters().get("text"));
-        Assertions.assertTrue(linkTracker.getTrackedLinks(chatId).isEmpty());
-        Assertions.assertEquals(chatId, actualResult.getParameters().get("chat_id"));
+    @Test
+    public void assertThatIncorrectLinkReturnedRightResponse() {
+        when(message.text()).thenReturn("/untrack some_link");
+        assertEquals("Incorrect link", unTrackCommand.handle(update).getParameters().get("text"));
+    }
+
+    @Test
+    public void assertThatUnTrackExistingLinkReturnedRightResponse() {
+        when(message.text()).thenReturn("/untrack https://www.tinkoff.ru");
+        repository.save(new UserChat(chatId, new ArrayList<>(List.of("https://www.tinkoff.ru"))));
+
+        assertEquals(
+            "Tracking stopped for the link: https://www.tinkoff.ru",
+            unTrackCommand.handle(update).getParameters().get("text")
+        );
+    }
+
+    @Test
+    public void assertThatUnTrackNotExistingLinkReturnedRightResponse() {
+        when(message.text()).thenReturn("/untrack https://www.tinkoff.ru");
+        repository.save(new UserChat(chatId, new ArrayList<>()));
+
+        assertEquals("Link is not tracked", unTrackCommand.handle(update).getParameters().get("text"));
     }
 }

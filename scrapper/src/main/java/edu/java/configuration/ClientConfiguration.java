@@ -1,5 +1,6 @@
 package edu.java.configuration;
 
+import edu.java.client.BotClient;
 import edu.java.client.GitHubClient;
 import edu.java.client.StackOverflowClient;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +14,16 @@ public class ClientConfiguration {
 
     @Bean
     public GitHubClient gitHubClient() {
-        return new GitHubClient(config.linkClient().github());
+        return new GitHubClient(config.client().gitHub());
     }
 
     @Bean
     public StackOverflowClient stackOverflowClient() {
-        return new StackOverflowClient(config.linkClient().stackOverflow());
+        return new StackOverflowClient(config.client().stackOverflow());
+    }
+
+    @Bean
+    public BotClient botClient() {
+        return new BotClient(config.client().bot());
     }
 }

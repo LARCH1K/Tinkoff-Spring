@@ -2,17 +2,18 @@ package edu.java.bot.commands;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.models.LinkTracker;
+import edu.java.bot.entity.UserChat;
+import edu.java.bot.repository.LinkTracker;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ListCommand implements Command {
-    private final LinkTracker linkTracker;
 
-    public ListCommand(LinkTracker linkTracker) {
-        this.linkTracker = linkTracker;
-    }
+    private final LinkTracker repository;
 
     @Override
     public String command() {
@@ -27,17 +28,26 @@ public class ListCommand implements Command {
     @Override
     public SendMessage handle(Update update) {
         long chatId = update.message().chat().id();
+        UserChat userChat = repository.findById(chatId);
+//        if (userChat == null) {
+//            return new SendMessage(chatId, "Please, register -- /start.");
+//        }
 
-        List<String> trackedLinks = linkTracker.getTrackedLinks(chatId);
+        List<String> links = userChat.getTrackingLinks();
 
-        if (trackedLinks.isEmpty()) {
+        if (links.isEmpty()) {
             return new SendMessage(chatId, "The list of tracked links is empty.");
-        } else {
-            StringBuilder message = new StringBuilder("Tracked Links:\n");
-            for (String link : trackedLinks) {
-                message.append(link).append("\n");
-            }
-            return new SendMessage(chatId, message.toString());
         }
+
+        return new SendMessage(chatId, buildListOfLinks(links));
+
+    }
+
+    @NotNull private static String buildListOfLinks(List<String> links) {
+        StringBuilder message = new StringBuilder("Tracked Links:\n");
+        for (String link : links) {
+            message.append(link).append("\n");
+        }
+        return message.toString();
     }
 }

@@ -1,50 +1,41 @@
 package edu.java.bot.commands;
 
-import com.pengrad.telegrambot.model.Chat;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.SendMessage;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
+import edu.java.bot.entity.UserChat;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
-public class StartCommandTest {
-
+@MockitoSettings(strictness = Strictness.LENIENT)
+public class StartCommandTest extends CommandTest {
     // Class to be tested
     @InjectMocks
     private StartCommand startCommand;
 
-    // Dependencies (will be mocked)
-    @Mock
-    private Update update;
-    @Mock
-    private Message message;
-    @Mock
-    private Chat chat;
-
-    final long chatId = 123L;
-
-    @BeforeEach
-    void init() {
-        when(update.message()).thenReturn(message);
-        when(message.chat()).thenReturn(chat);
-        when(chat.id()).thenReturn(chatId);
+    @Test
+    public void assertThatCommandReturnedRightString() {
+        assertEquals("/start", startCommand.command());
     }
 
     @Test
-    @DisplayName("Check /start command")
-    void startCommandTest() {
-        SendMessage actualResult = startCommand.handle(update);
-        String expectedString = "Welcome! You are now registered.";
+    public void assertThatDescriptionReturnedRightString() {
+        assertEquals("Register the user", startCommand.description());
+    }
 
-        Assertions.assertEquals(expectedString, actualResult.getParameters().get("text"));
-        Assertions.assertEquals(chatId, actualResult.getParameters().get("chat_id"));
+    @Test
+    public void assertThatNewUserAddInRepository() {
+        startCommand.handle(update);
+
+        UserChat userChat = repository.findById(chatId);
+
+        assertNotNull(userChat);
+        assertEquals(chatId, userChat.getChatId());
+        assertEquals(List.of(), userChat.getTrackingLinks());
     }
 }
