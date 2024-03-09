@@ -1,20 +1,13 @@
 package edu.java.bot.commands;
 
-import com.pengrad.telegrambot.model.Chat;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.entity.UserChat;
-import edu.java.bot.repository.LinkTracker;
 import java.util.Collections;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;

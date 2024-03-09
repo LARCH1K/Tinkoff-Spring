@@ -8,10 +8,6 @@ app:
     stackOverflow: "https://api.stackexchange.com/2.3"
     bot: ${BOT_URL:http://localhost:8090}
 
-  client:
-    gitHub: "https://api.github.com"
-    stackOverflow: "https://api.stackexchange.com/2.3"
-
 spring:
   application:
     name: scrapper
