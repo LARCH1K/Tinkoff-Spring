@@ -2,6 +2,7 @@ package edu.java.client;
 
 import edu.java.entity.dto.GitHubResponse;
 import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 public class GitHubClient extends Client {
 
@@ -9,11 +10,10 @@ public class GitHubClient extends Client {
         super(url);
     }
 
-    public GitHubResponse getIssue(String owner, String repo, long issueNumber) {
+    public Mono<GitHubResponse> getIssue(String owner, String repo, long issueNumber) {
         return Objects.requireNonNull(webClient.get()
             .uri("/repos/{owner}/{repo}/issues/{issueNumber}", owner, repo, issueNumber)
             .retrieve()
-            .bodyToMono(GitHubResponse.class)
-            .block());
+            .bodyToMono(GitHubResponse.class));
     }
 }

@@ -61,7 +61,8 @@ public class ScrapperClient extends Client {
             .bodyValue(request)
             .retrieve()
             .onStatus(
-                HttpStatus.BAD_REQUEST::equals,
+                statusCode -> HttpStatus.NOT_FOUND.equals(statusCode) || HttpStatus.BAD_REQUEST.equals(statusCode)
+                    || HttpStatus.NOT_ACCEPTABLE.equals(statusCode),
                 response -> response.bodyToMono(ApiErrorResponse.class).map(ApiErrorResponseException::new)
             )
             .toEntity(LinkResponse.class);
