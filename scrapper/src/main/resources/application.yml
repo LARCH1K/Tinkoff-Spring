@@ -3,11 +3,13 @@ app:
     enable: true
     interval: 10s
     force-check-delay: 10s
+    link-last-check-interval: 30s
   client:
     gitHub: "https://api.github.com"
     stackOverflow: "https://api.stackexchange.com/2.3"
     bot: ${BOT_URL:http://localhost:8090}
-
+  debug-information:
+    api-error-response-stack-trace-list-length: 5
 spring:
   application:
     name: scrapper
@@ -20,6 +22,8 @@ spring:
 
 server:
   port: 8080
-
+# http://localhost:8080/swagger-ui/index.html
 logging:
   config: classpath:log4j2-plain.xml
+  level:
+    org.springframework.jdbc.core: DEBUG
