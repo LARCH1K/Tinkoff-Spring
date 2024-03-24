@@ -1,10 +1,10 @@
 package edu.java.bot.client;
 
-import edu.java.bot.dto.AddLinkRequest;
-import edu.java.bot.dto.ApiErrorResponse;
-import edu.java.bot.dto.LinkResponse;
-import edu.java.bot.dto.ListLinksResponse;
-import edu.java.bot.dto.RemoveLinkRequest;
+import edu.java.bot.entity.dto.AddLinkRequest;
+import edu.java.bot.entity.dto.ApiErrorResponse;
+import edu.java.bot.entity.dto.LinkResponse;
+import edu.java.bot.entity.dto.ListLinksResponse;
+import edu.java.bot.entity.dto.RemoveLinkRequest;
 import edu.java.bot.exception.ApiErrorResponseException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -48,7 +48,7 @@ public class ScrapperClient extends Client {
             .header(TG_CHAT_ID_HEADER, tgChatId.toString())
             .retrieve()
             .onStatus(
-                HttpStatus.BAD_REQUEST::equals,
+                statusCode -> HttpStatus.NOT_FOUND.equals(statusCode) || HttpStatus.BAD_REQUEST.equals(statusCode),
                 response -> response.bodyToMono(ApiErrorResponse.class).map(ApiErrorResponseException::new)
             )
             .toEntity(ListLinksResponse.class);

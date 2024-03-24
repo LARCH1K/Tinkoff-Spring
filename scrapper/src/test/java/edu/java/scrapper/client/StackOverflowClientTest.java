@@ -38,12 +38,12 @@ public class StackOverflowClientTest {
     @Test
     public void testFetchQuestion() {
         // Simulate response from Stack Overflow API
-        WIRE_MOCK_SERVER.stubFor(get(urlEqualTo("/questions/1?site=stackoverflow&filter=withbody"))
+        WIRE_MOCK_SERVER.stubFor(get(urlEqualTo("/questions/1/answers?site=stackoverflow&filter=withbody"))
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", "application/json")
                 .withBody(
-                    "{ \"items\": [{\"owner\": {\"account_id\": 123}, \"last_activity_date\": 1645718400, \"creation_date\": 1645711400, \"answer_id\": 456, \"body\": \"This is the answer.\"}]}")));
+                    "{ \"items\": [{\"owner\": {\"display_name\": \"123\"}, \"last_activity_date\": 1645718400, \"creation_date\": 1645711400, \"answer_id\": 456, \"body\": \"This is the answer.\"}]}")));
 
         // Use the client with WireMock
         // Getting Reply from Customer
@@ -52,7 +52,7 @@ public class StackOverflowClientTest {
         // Check that the response contains the expected data
         assertEquals(1, response.items().size());
         StackOverflowResponse.ItemResponse item = response.items().getFirst();
-        assertEquals(123, item.owner().accountId());
+        assertEquals("123", item.owner().displayName());
         assertEquals(
             OffsetDateTime.ofInstant(Instant.ofEpochSecond(1645718400), ZoneId.of("Z")),
             item.lastActivityDate()

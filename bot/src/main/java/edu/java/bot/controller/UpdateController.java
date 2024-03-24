@@ -1,6 +1,6 @@
 package edu.java.bot.controller;
 
-import edu.java.bot.dto.LinkUpdateRequest;
+import edu.java.bot.entity.dto.LinkUpdateRequest;
 import edu.java.bot.service.LinkUpdateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

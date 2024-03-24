@@ -13,5 +13,4 @@ public record ApplicationConfig(
 ) {
     public record Client(String scrapper) {
     }
-
 }
