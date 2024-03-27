@@ -29,11 +29,18 @@ public class JdbcLinkRepository implements EntityRepository<Link> {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final BeanPropertyRowMapper<Link> beanPropertyRowMapper;
+
+    public JdbcLinkRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.beanPropertyRowMapper = new BeanPropertyRowMapper<>(Link.class);
+    }
+
     @Override
     public Link add(Link entity) {
         return jdbcTemplate.queryForObject(
             ADD_QUERY,
-            new BeanPropertyRowMapper<>(Link.class),
+            beanPropertyRowMapper,
             entity.getUrl().toString(),
             entity.getLastUpdatedAt()
         );
@@ -41,18 +48,18 @@ public class JdbcLinkRepository implements EntityRepository<Link> {
 
     @Override
     public Link remove(Link entity) {
-        return jdbcTemplate.queryForObject(DELETE_QUERY, new BeanPropertyRowMapper<>(Link.class), entity.getId());
+        return jdbcTemplate.queryForObject(DELETE_QUERY, beanPropertyRowMapper, entity.getId());
     }
 
     @Override
     public Collection<Link> findAll() {
-        return jdbcTemplate.query(SELECT_ALL, new BeanPropertyRowMapper<>(Link.class));
+        return jdbcTemplate.query(SELECT_ALL, beanPropertyRowMapper);
     }
 
     public Collection<Link> findAllWithInterval(Duration interval) {
         return jdbcTemplate.query(
             SELECT_ALL_WITH_INTERVAL,
-            new BeanPropertyRowMapper<>(Link.class),
+            beanPropertyRowMapper,
             Timestamp.from(OffsetDateTime.now().minusSeconds(interval.getSeconds()).toInstant())
         );
     }
@@ -60,7 +67,7 @@ public class JdbcLinkRepository implements EntityRepository<Link> {
     public Link findByUrl(URI url) {
         return jdbcTemplate.queryForObject(
             SELECT_BY_URL,
-            new BeanPropertyRowMapper<>(Link.class),
+            beanPropertyRowMapper,
             url.toString()
         );
     }
@@ -74,7 +81,7 @@ public class JdbcLinkRepository implements EntityRepository<Link> {
     }
 
     public Collection<Link> findAllForChat(Long chatId) {
-        return jdbcTemplate.query(SELECT_ALL_FOR_CHAT, new BeanPropertyRowMapper<>(Link.class), chatId);
+        return jdbcTemplate.query(SELECT_ALL_FOR_CHAT, beanPropertyRowMapper, chatId);
     }
 
     public List<Long> findAllChatsForLink(Long linkId) {

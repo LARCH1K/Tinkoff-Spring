@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public class JdbcLinkService implements LinkService {
@@ -26,6 +27,7 @@ public class JdbcLinkService implements LinkService {
     private final LinkUtil linkUtil;
 
     @Override
+    @Transactional
     public LinkResponse add(Long tgChatId, URI url) {
         Link link;
 
