@@ -29,7 +29,7 @@ public class LinkUpdaterScheduler {
         linkService.listAllWithInterval(config.scheduler().linkLastCheckInterval()).forEach(link -> {
             for (BaseClientProcessor clientProcessor : clientProcessors) {
                 if (clientProcessor.isCandidate(link.getUrl())) {
-                    LinkUpdateRequest s = clientProcessor.getUpdate(link)
+                    LinkUpdateRequest linkUpdateRequest = clientProcessor.getUpdate(link)
                         .filter(Objects::nonNull)
                         .map(update -> new LinkUpdateRequest(
                             link.getId(),
@@ -37,8 +37,8 @@ public class LinkUpdaterScheduler {
                             update,
                             linkService.getAllChatsForLink(link.getId())
                         )).block();
-                    if (s != null) {
-                        botClient.sendUpdate(s);
+                    if (linkUpdateRequest != null) {
+                        botClient.sendUpdate(linkUpdateRequest);
                     }
                     linkService.updateLink(link.setLastUpdatedAt(OffsetDateTime.now()));
 

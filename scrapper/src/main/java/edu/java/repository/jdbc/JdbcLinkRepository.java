@@ -7,14 +7,12 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@RequiredArgsConstructor
 public class JdbcLinkRepository implements JdbcRepository<Link> {
     private static final String ADD_QUERY = "INSERT INTO link (url, last_updated_at) VALUES (?, ?) RETURNING *";
     private static final String DELETE_QUERY = "DELETE FROM link WHERE id=? RETURNING *";
@@ -31,12 +29,19 @@ public class JdbcLinkRepository implements JdbcRepository<Link> {
 
     private final JdbcTemplate jdbcTemplate;
 
+    private final BeanPropertyRowMapper<Link> beanPropertyRowMapper;
+
+    public JdbcLinkRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.beanPropertyRowMapper = new BeanPropertyRowMapper<>(Link.class);
+    }
+
     @Override
     @Transactional
     public Link add(Link entity) {
         return jdbcTemplate.queryForObject(
             ADD_QUERY,
-            new BeanPropertyRowMapper<>(Link.class),
+            beanPropertyRowMapper,
             entity.getUrl().toString(),
             entity.getLastUpdatedAt()
         );
@@ -45,20 +50,20 @@ public class JdbcLinkRepository implements JdbcRepository<Link> {
     @Override
     @Transactional
     public Link remove(Link entity) {
-        return jdbcTemplate.queryForObject(DELETE_QUERY, new BeanPropertyRowMapper<>(Link.class), entity.getId());
+        return jdbcTemplate.queryForObject(DELETE_QUERY, beanPropertyRowMapper, entity.getId());
     }
 
     @Override
     @Transactional
     public Collection<Link> findAll() {
-        return jdbcTemplate.query(SELECT_ALL, new BeanPropertyRowMapper<>(Link.class));
+        return jdbcTemplate.query(SELECT_ALL, beanPropertyRowMapper);
     }
 
     @Transactional
     public Collection<Link> findAllWithInterval(Duration interval) {
         return jdbcTemplate.query(
             SELECT_ALL_WITH_INTERVAL,
-            new BeanPropertyRowMapper<>(Link.class),
+            beanPropertyRowMapper,
             Timestamp.from(OffsetDateTime.now().minusSeconds(interval.getSeconds()).toInstant())
         );
     }
@@ -67,7 +72,7 @@ public class JdbcLinkRepository implements JdbcRepository<Link> {
     public Link findByUrl(URI url) {
         return jdbcTemplate.queryForObject(
             SELECT_BY_URL,
-            new BeanPropertyRowMapper<>(Link.class),
+            beanPropertyRowMapper,
             url.toString()
         );
     }
@@ -84,7 +89,7 @@ public class JdbcLinkRepository implements JdbcRepository<Link> {
 
     @Transactional
     public Collection<Link> findAllForChat(Long chatId) {
-        return jdbcTemplate.query(SELECT_ALL_FOR_CHAT, new BeanPropertyRowMapper<>(Link.class), chatId);
+        return jdbcTemplate.query(SELECT_ALL_FOR_CHAT, beanPropertyRowMapper, chatId);
     }
 
     @Transactional

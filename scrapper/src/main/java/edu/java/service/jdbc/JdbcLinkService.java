@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -26,10 +27,11 @@ public class JdbcLinkService implements LinkService {
     private final List<BaseClientProcessor> clientProcessors;
 
     @Override
+    @Transactional
     public LinkResponse add(Long tgChatId, URI url) {
         Link link;
 
-        if (!isUrlSupports(url)) {
+        if (!isUrlSupported(url)) {
             throw new LinkNotSupportedException(url);
         }
 
@@ -87,7 +89,7 @@ public class JdbcLinkService implements LinkService {
         linkRepository.updateLink(link);
     }
 
-    private boolean isUrlSupports(URI url) {
+    private boolean isUrlSupported(URI url) {
         return clientProcessors.stream().anyMatch(clientProcessor -> clientProcessor.isCandidate(url));
     }
 }

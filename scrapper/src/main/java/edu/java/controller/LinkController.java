@@ -6,6 +6,8 @@ import edu.java.entity.dto.ListLinksResponse;
 import edu.java.entity.dto.RemoveLinkRequest;
 import edu.java.service.LinkService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +33,11 @@ public class LinkController {
     }
 
     @DeleteMapping
-    public LinkResponse removeLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request) {
-        return linkService.remove(tgChatId, request.link());
+    public ResponseEntity removeLink(
+        @RequestHeader("Tg-Chat-Id") Long tgChatId,
+        @RequestBody RemoveLinkRequest request
+    ) {
+        linkService.remove(tgChatId, request.link());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
