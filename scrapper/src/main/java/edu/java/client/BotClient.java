@@ -5,14 +5,21 @@ import edu.java.entity.dto.LinkUpdateRequest;
 import edu.java.exception.ApiErrorResponseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.support.RetryTemplate;
 
 public class BotClient extends Client {
-    public BotClient(String baseUrl) {
+
+    private final RetryTemplate retryTemplate;
+
+    public BotClient(String baseUrl, RetryTemplate retryTemplate) {
         super(baseUrl);
+
+        this.retryTemplate = retryTemplate;
     }
 
     public ResponseEntity<Void> sendUpdate(LinkUpdateRequest request) {
-        return webClient.post()
+//        System.out.println("Heeere");
+        return retryTemplate.execute(context -> webClient.post()
             .uri("/updates")
             .bodyValue(request)
             .retrieve()
@@ -20,6 +27,6 @@ public class BotClient extends Client {
                 HttpStatus.BAD_REQUEST::equals,
                 response -> response.bodyToMono(ApiErrorResponse.class).map(ApiErrorResponseException::new)
             )
-            .toBodilessEntity().block();
+            .toBodilessEntity().block());
     }
 }
