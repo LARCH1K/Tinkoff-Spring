@@ -6,6 +6,8 @@ import edu.java.entity.dto.ListLinksResponse;
 import edu.java.entity.dto.RemoveLinkRequest;
 import edu.java.service.LinkService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,20 +20,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/links")
 @RequiredArgsConstructor
 public class LinkController {
-    private final LinkService jooqLinkService;
+    private final LinkService linkService;
 
     @GetMapping
     public ListLinksResponse getAllLinks(@RequestHeader("Tg-Chat-Id") Long tgChatId) {
-        return jooqLinkService.listAllForChat(tgChatId);
+        return linkService.listAllForChat(tgChatId);
     }
 
     @PostMapping
     public LinkResponse addLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody AddLinkRequest request) {
-        return jooqLinkService.add(tgChatId, request.link());
+        return linkService.add(tgChatId, request.link());
     }
 
     @DeleteMapping
-    public LinkResponse removeLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request) {
-        return jooqLinkService.remove(tgChatId, request.link());
+    public ResponseEntity removeLink(
+        @RequestHeader("Tg-Chat-Id") Long tgChatId,
+        @RequestBody RemoveLinkRequest request
+    ) {
+        linkService.remove(tgChatId, request.link());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
