@@ -70,6 +70,7 @@ public record ApplicationConfig(
             }
         }
     }
+
     public record KafkaConfigInfo(
         String bootstrapServers,
         UpdatesTopic updatesTopic
